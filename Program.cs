@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using razor_web.models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using App.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +21,7 @@ builder.Services.AddDbContext<MyBlogContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyBlogContext"));
 });
 
-//Đăng ký identyti
+//Đăng ký identity
 builder.Services.AddIdentity<AppUser,IdentityRole>()
                 .AddEntityFrameworkStores<MyBlogContext>()
                 .AddDefaultTokenProviders();
@@ -74,6 +75,8 @@ builder.Services.AddAuthentication()
         googleOptions.CallbackPath = "/dang-nhap-tu-google";
 
     });
+
+builder.Services.AddSingleton<IdentityErrorDescriber,AppIdentityErrorDescriber>();
 
 var app = builder.Build();
 

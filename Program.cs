@@ -1,11 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using razor.models;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 // Add services to the container.
 builder.Services.AddRazorPages(); 
+builder.Services.AddDbContext<ArticleContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ArticleContext") ?? throw new InvalidOperationException("Connection string 'ArticleContext' not found.")));
 
 builder.Services.AddDbContext<MyBlogContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyBlogContext"));

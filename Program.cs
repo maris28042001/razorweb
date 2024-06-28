@@ -61,6 +61,20 @@ builder.Services.ConfigureApplicationCookie(options =>{
     options.AccessDeniedPath= "/khongduoctruycap.html/";
 });
 
+builder.Services.AddAuthentication()
+    .AddGoogle(googleOptions =>
+    {
+        // Đọc thông tin Authentication:Google từ appsettings.json
+        IConfigurationSection googleConfig = builder.Configuration.GetSection("Authentication:Google");
+ 
+        // Thiết lập ClientID và ClientSecret để truy cập API google
+        googleOptions.ClientId = googleConfig["ClientId"];
+        googleOptions.ClientSecret = googleConfig["ClientSecret"];
+        // Cấu hình Url callback lại từ Google (không thiết lập thì mặc định là /signin-google)
+        googleOptions.CallbackPath = "/dang-nhap-tu-google";
+
+    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.cel

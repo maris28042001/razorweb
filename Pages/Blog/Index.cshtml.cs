@@ -13,9 +13,9 @@ namespace razor_web.Pages_Blog
     [Authorize]
     public class IndexModel : PageModel
     {
-        private readonly razor.models.MyBlogContext _context;
+        private readonly razor.models.AppDbContext _context;
 
-        public IndexModel(razor.models.MyBlogContext context)
+        public IndexModel(razor.models.AppDbContext context)
         {
             _context = context;
         }

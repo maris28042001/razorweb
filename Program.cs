@@ -5,6 +5,9 @@ using razor_web.models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using App.Services;
+using App.Security.Requirements;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,13 +20,13 @@ builder.Services.AddSingleton<IEmailSender, SendMailService>();
 
 builder.Services.AddRazorPages(); 
 
-builder.Services.AddDbContext<MyBlogContext>(options => {
+builder.Services.AddDbContext<AppDbContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyBlogContext"));
 });
 
 //Đăng ký identity
 builder.Services.AddIdentity<AppUser,IdentityRole>()
-                .AddEntityFrameworkStores<MyBlogContext>()
+                .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
 
 // builder.Services.AddDefaultIdentity<AppUser>()
@@ -84,9 +87,26 @@ builder.Services.AddAuthorization(options =>{
         // policyBuilder.RequireRole("Admin");
         // policyBuilder.RequireRole("Editor");
         // policyBuilder.RequireClaim("manager.role","add","update");
-        // policyBuilder.RequireClaim("canedit","user");
+        policyBuilder.RequireClaim("canedit","user");
     });
+
+    options.AddPolicy("InGenZ", policyBuilder =>{
+        policyBuilder.RequireAuthenticatedUser(); // user phải đăng nhập
+        policyBuilder.Requirements.Add(new GenZRequirement());
+    });
+
+    options.AddPolicy("ShowAdminMenu", policyBuilder =>{
+        policyBuilder.RequireAuthenticatedUser(); // user phải đăng nhập
+        policyBuilder.RequireRole("Admin"); 
+    });
+
+    options.AddPolicy("CanUpdateArticle", policyBuilder =>{
+        policyBuilder.Requirements.Add(new ArticleUpdateRequirement());
+    });
+    
 });
+
+builder.Services.AddTransient<IAuthorizationHandler, AppAuthorizationHandler>();
 
 var app = builder.Build();
 

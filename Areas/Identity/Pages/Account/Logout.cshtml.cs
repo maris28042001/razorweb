@@ -18,11 +18,19 @@ namespace razor_web.Areas.Identity.Pages.Account
         private readonly SignInManager<AppUser> _signInManager;
         private readonly ILogger<LogoutModel> _logger;
 
-        public LogoutModel(SignInManager<AppUser> signInManager, ILogger<LogoutModel> logger)
+        private readonly UserManager<AppUser> _userManager; 
+
+        public LogoutModel(SignInManager<AppUser> signInManager, ILogger<LogoutModel> logger, UserManager<AppUser> userManager)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _userManager = userManager;
         }
+
+        public void OnGet(){
+            _signInManager.IsSignedIn(User);
+        }
+
 
         public async Task<IActionResult> OnPost(string returnUrl = null)
         {
@@ -36,7 +44,8 @@ namespace razor_web.Areas.Identity.Pages.Account
             {
                 // This needs to be a redirect so that the browser performs a new
                 // request and the identity for the user gets updated.
-                return RedirectToPage();
+                returnUrl = Url.Content("~/");
+                return LocalRedirect(returnUrl);
             }
         }
     }

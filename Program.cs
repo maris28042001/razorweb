@@ -78,6 +78,16 @@ builder.Services.AddAuthentication()
 
 builder.Services.AddSingleton<IdentityErrorDescriber,AppIdentityErrorDescriber>();
 
+builder.Services.AddAuthorization(options =>{
+    options.AddPolicy("AllowEditRole", policyBuilder =>{
+        policyBuilder.RequireAuthenticatedUser(); // user phải đăng nhập
+        // policyBuilder.RequireRole("Admin");
+        // policyBuilder.RequireRole("Editor");
+        // policyBuilder.RequireClaim("manager.role","add","update");
+        // policyBuilder.RequireClaim("canedit","user");
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.cel

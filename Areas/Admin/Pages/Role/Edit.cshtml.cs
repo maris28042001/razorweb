@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using razor.models;
 
 namespace App.Admin.Role
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "AllowEditRole")]
     public class EditModel : RolePageModel
     {
         public EditModel(RoleManager<IdentityRole> roleManager, MyBlogContext myBlogContext) : base(roleManager, myBlogContext)
@@ -24,6 +25,7 @@ namespace App.Admin.Role
         [BindProperty]
         public InputModel Input { get; set; }
 
+        public List<IdentityRoleClaim<string>> Claims { get; set; }
         public IdentityRole role { get; set; }
         public async Task<IActionResult> OnGet(string roleid)
         {
@@ -35,6 +37,7 @@ namespace App.Admin.Role
                 Input = new InputModel(){
                     Name = role.Name
                 };
+                Claims = await _myBlogContext.RoleClaims.Where(rc => rc.RoleId == role.Id).ToListAsync();
                 return Page();
             }
             return NotFound("Không tìm thấy role");
@@ -48,6 +51,8 @@ namespace App.Admin.Role
             if(role == null){
                 return NotFound("Không tìm thấy role");
             }
+            
+            Claims = await _myBlogContext.RoleClaims.Where(rc => rc.RoleId == role.Id).ToListAsync();
 
             if(!ModelState.IsValid){
                 return Page();
